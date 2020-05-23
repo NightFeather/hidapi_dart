@@ -1,3 +1,7 @@
+## [0.0.3] - 2020/05/23
+
+* Add example
+
 ## [0.0.2] - 2020/05/23
 
 * Removed debug output inside HID.flush
