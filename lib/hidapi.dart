@@ -85,7 +85,7 @@ class HID {
     }
   }
 
-  Future<String> read({len: 1024, timeout: 0}) async {
+  Future<String> read({len=1024, timeout=0}) async {
     Pointer<Uint8> buffer = allocate<Uint8>(count: len);
     buffer.asTypedList(1024).fillRange(0, len - 1, 0);
 
@@ -109,8 +109,8 @@ class HID {
   void flush() {
     Pointer<Uint8> buffer = allocate<Uint8>(count: 1024);
     buffer.asTypedList(1024).fillRange(0, 1023, 0);
-    while (_readDeviceTimeout(this.device, buffer, 1024, 100) <= 0)
-      free(buffer);
+    while (_readDeviceTimeout(this.device, buffer, 1024, 100) <= 0) {}
+    free(buffer);
   }
 
   Future<int> write(String data) async {

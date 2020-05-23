@@ -1,3 +1,7 @@
+## [0.0.4] - 2020/05/23
+
+* Fix a multiple free caused by missing colon
+
 ## [0.0.3] - 2020/05/23
 
 * Add example
