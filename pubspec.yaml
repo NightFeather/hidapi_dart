@@ -1,8 +1,8 @@
 name: hidapi_dart
-description: A new Flutter package project.
+description: hidapi bridged into dart with ffi
 version: 0.0.1
-author:
-homepage:
+author: Nightfeather
+homepage: https://github.com/Nightfeather/hidapi_dart
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

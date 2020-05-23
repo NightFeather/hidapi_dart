@@ -98,10 +98,8 @@ class HID {
   void flush() {
     Pointer<Uint8> buffer = allocate<Uint8>(count: 1024);
     buffer.asTypedList(1024).fillRange(0,1023,0);
-    while(_readDeviceTimeout(this.device, buffer, 1024, 100) <= 0) {
-      String str = String.fromCharCodes(buffer.asTypedList(1024));
-      stdout.writeln(str.substring(2,buffer.elementAt(1).value));
-    }
+    while(_readDeviceTimeout(this.device, buffer, 1024, 100) <= 0)
+
     free(buffer);
   }
 
