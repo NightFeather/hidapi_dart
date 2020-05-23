@@ -1,5 +1,7 @@
 name: hidapi_dart
-description: hidapi bridged into dart with ffi
+description: |
+  This package is a thin layer of ffi interface to hidapi library.
+  Built for communiating with hid devices.
 version: 0.0.2
 author: Nightfeather
 homepage: https://github.com/Nightfeather/hidapi_dart
