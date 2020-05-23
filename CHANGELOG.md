@@ -1,3 +1,7 @@
-## [0.0.1] - TODO: Add release date.
+## [0.0.2] - 2020/05/23
 
-* TODO: Describe initial release.
+* Removed debug output inside HID.flush
+
+## [0.0.1] - 2020/05/23
+
+* Added `hid_open`, `hid_write`, `hid_read`, `hid_timeout`, `hid_close`
