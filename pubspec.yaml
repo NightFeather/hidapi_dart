@@ -1,6 +1,6 @@
 name: hidapi_dart
 description: hidapi bridged into dart with ffi
-version: 0.0.1
+version: 0.0.2
 author: Nightfeather
 homepage: https://github.com/Nightfeather/hidapi_dart
 
