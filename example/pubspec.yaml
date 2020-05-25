@@ -1,0 +1,14 @@
+name: hidapi_dart_example
+description: |
+  Example for package hidapi_dart
+version: 0.0.1
+author: Nightfeather
+homepage: https://github.com/Nightfeather/hidapi_dart
+
+publist_to: "none"
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  hidapi_dart: ^0.0.4
