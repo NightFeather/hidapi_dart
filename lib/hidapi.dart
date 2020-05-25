@@ -1,7 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
-
-import './allocation.dart';
+import 'package:ffi/src/allocation.dart';
 
 // void pointer
 final Pointer<Void> nullptr = Pointer<Void>.fromAddress(0);
