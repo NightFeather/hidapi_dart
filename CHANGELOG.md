@@ -1,3 +1,7 @@
+## [0.0.5] - 2020/05/25
+
+* Fix the dependency from copied allocation.dart to package:ffi one
+
 ## [0.0.4] - 2020/05/23
 
 * Fix a multiple free caused by missing colon
