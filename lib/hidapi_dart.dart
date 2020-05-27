@@ -1,3 +1,3 @@
 library hidapi_dart;
 
-export './hidapi.dart' hide nullptr;
+export './hid.dart' show HID;
