@@ -16,10 +16,10 @@ class HID {
   /// Expose the `hid_init` function.
   ///
   /// no need to manually call this, since hidapi will automatically call this during first hid_open.
-  static init() => hidInit();
+  static init() => _hidInit();
 
   /// Expose the `hid_exit` function.
-  static exit() => hidExit();
+  static exit() => _hidExit();
 
   /// call `hid_open` to open the specified device.
   ///
@@ -32,7 +32,7 @@ class HID {
       buffer.asTypedList(1024).setAll(0, this.serial.runes);
     }
 
-    this.device = openDevice(this.idVendor, this.idProduct, buffer);
+    this.device = _openDevice(this.idVendor, this.idProduct, buffer);
 
     free(buffer);
 
@@ -41,7 +41,7 @@ class HID {
 
   void close() {
     if (this.device != nullptr) {
-      closeDevice(this.device);
+      _closeDevice(this.device);
     }
   }
 

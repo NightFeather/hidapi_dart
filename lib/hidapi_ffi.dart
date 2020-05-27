@@ -43,8 +43,3 @@ typedef _WriteDeviceFnNative = Int32 Function(Pointer, Pointer<Uint8>, Int32);
 typedef _WriteDeviceFnDart = int Function(Pointer, Pointer<Uint8>, int);
 final _WriteDeviceFnDart _writeDevice = _hidapi
     .lookupFunction<_WriteDeviceFnNative, _WriteDeviceFnDart>('hid_write');
-
-final hidInit = _hidInit;
-final hidExit = _hidExit;
-final openDevice = _openDevice;
-final closeDevice = _closeDevice;
