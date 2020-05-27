@@ -1,3 +1,7 @@
+## [0.0.7] - 2020/05/28
+
+* Minor changes
+
 ## [0.0.6] - 2020/05/28
 
 * More useful example
