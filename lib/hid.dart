@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/src/allocation.dart';
 
-part 'hidapi.dart';
+part 'hidapi_ffi.dart';
 
 /// Wrap around the hid_device pointer.
 class HID {
