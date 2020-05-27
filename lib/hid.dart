@@ -23,8 +23,7 @@ class HID {
 
   /// call `hid_open` to open the specified device.
   /// 
-  /// return 0 on success
-  /// return -1 on failure
+  /// return 0 on success, -1 on failure
   int open() {
     Pointer<Uint8> buffer = nullptr.cast();
 
