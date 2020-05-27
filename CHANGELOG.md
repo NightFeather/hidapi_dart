@@ -1,3 +1,9 @@
+## [0.0.6] - 2020/05/28
+
+* More useful example
+* Fix potential memory oob access and memory leak.
+* Remove `HID#flush`, since not needed.
+
 ## [0.0.5] - 2020/05/25
 
 * Fix the dependency from copied allocation.dart to package:ffi one
