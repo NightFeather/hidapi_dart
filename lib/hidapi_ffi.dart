@@ -1,8 +1,5 @@
 part of 'hid.dart';
 
-// void pointer
-final Pointer<Void> nullptr = Pointer<Void>.fromAddress(0);
-
 final _hidapi = Platform.isLinux
     ? DynamicLibrary.open('libhidapi-libusb.so')
     : DynamicLibrary.open('hidapi.dll');
