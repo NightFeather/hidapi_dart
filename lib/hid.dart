@@ -11,7 +11,8 @@ class HID {
   final int idVendor;
   final int idProduct;
   final String serial;
-  Pointer device = nullptr;
+
+  Pointer _device = nullptr;
 
   /// Expose the `hid_init` function.
   ///
@@ -32,16 +33,16 @@ class HID {
       buffer.asTypedList(1024).setAll(0, this.serial.runes);
     }
 
-    this.device = _openDevice(this.idVendor, this.idProduct, buffer);
+    this._device = _openDevice(this.idVendor, this.idProduct, buffer);
 
     free(buffer);
 
-    return this.device == nullptr ? -1 : 0;
+    return this._device == nullptr ? -1 : 0;
   }
 
   void close() {
-    if (this.device != nullptr) {
-      _closeDevice(this.device);
+    if (this._device != nullptr) {
+      _closeDevice(this._device);
     }
   }
 
@@ -53,9 +54,9 @@ class HID {
     int ret = 0;
 
     if (timeout > 0) {
-      ret = _readDeviceTimeout(this.device, buffer, len, timeout);
+      ret = _readDeviceTimeout(this._device, buffer, len, timeout);
     } else {
-      ret = _readDevice(this.device, buffer, len);
+      ret = _readDevice(this._device, buffer, len);
     }
 
     if (ret > 0) {
@@ -72,7 +73,7 @@ class HID {
     Pointer<Uint8> buffer = allocate<Uint8>(count: bufferSize);
     var array = buffer.asTypedList(bufferSize);
     array.setAll(0, data.runes);
-    int ret = _writeDevice(this.device, buffer, bufferSize);
+    int ret = _writeDevice(this._device, buffer, bufferSize);
     free(buffer);
     return ret;
   }
