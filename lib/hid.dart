@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'package:ffi/src/allocation.dart';
+import 'package:ffi/ffi.dart';
 
 part 'hidapi_ffi.dart';
 
@@ -13,6 +13,7 @@ class HID {
   final String serial;
 
   Pointer _device = nullptr;
+  bool _nonblocking = false;
 
   /// Expose the `hid_init` function.
   ///
@@ -76,5 +77,41 @@ class HID {
     int ret = _writeDevice(this._device, buffer, bufferSize);
     free(buffer);
     return ret;
+  }
+
+  set nonblocking(bool val) {
+    this._nonblocking = val;
+    _setNonblocking(this._device, val ? 1 : 0);
+  }
+
+  bool get nonblocking => this._nonblocking;
+
+  Future<int> sendFeatureReport(String data) async {
+    assert(data.length < 256);
+    int len = data.length;
+    Pointer<Uint8> buffer = allocate<Uint8>(count: len);
+    buffer.asTypedList(len).setAll(0, data.runes);
+
+    int ret = _sendFeatureReport(this._device, buffer, len);
+    free(buffer);
+
+    return ret;
+  }
+
+  Future<String> getFeatureReport(int index, { buffLen: 1024 }) async {
+    assert(index < 256);
+    Pointer<Uint8> buffer = allocate<Uint8>(count: buffLen);
+    buffer.asTypedList(buffLen).fillRange(0, buffLen - 1, 0);
+    buffer[0] = index;
+
+    String res = null;
+    int ret = _getFeatureReport(this._device, buffer, buffLen);
+
+    if(ret > 0) {
+      res = String.fromCharCodes(buffer.asTypedList(ret));
+    }
+
+    free(buffer);
+    return res;
   }
 }

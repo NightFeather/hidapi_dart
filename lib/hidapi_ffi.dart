@@ -40,3 +40,18 @@ typedef _WriteDeviceFnNative = Int32 Function(Pointer, Pointer<Uint8>, Int32);
 typedef _WriteDeviceFnDart = int Function(Pointer, Pointer<Uint8>, int);
 final _WriteDeviceFnDart _writeDevice = _hidapi
     .lookupFunction<_WriteDeviceFnNative, _WriteDeviceFnDart>('hid_write');
+
+typedef _SetNonblockingFnNative = Int32 Function(Pointer, Int32);
+typedef _SetNonblockingFnDart = int Function(Pointer, int);
+final _SetNonblockingFnDart _setNonblocking = _hidapi
+    .lookupFunction<_SetNonblockingFnNative, _SetNonblockingFnDart>('hid_set_nonblocking');
+
+typedef _SendFeatureReportFnNative = Int32 Function(Pointer, Pointer<Uint8>, Int32);
+typedef _SendFeatureReportFnDart = int Function(Pointer, Pointer<Uint8>, int);
+final _SendFeatureReportFnDart _sendFeatureReport = _hidapi
+    .lookupFunction<_SendFeatureReportFnNative, _SendFeatureReportFnDart>('hid_send_feature_report');
+
+typedef _GetFeatureReportFnNative = Int32 Function(Pointer, Pointer<Uint8>, Int32);
+typedef _GetFeatureReportFnDart = int Function(Pointer, Pointer<Uint8>, int);
+final _GetFeatureReportFnDart _getFeatureReport = _hidapi
+    .lookupFunction<_GetFeatureReportFnNative, _GetFeatureReportFnDart>('hid_get_feature_report');
