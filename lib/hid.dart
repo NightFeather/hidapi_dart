@@ -49,9 +49,9 @@ class HID {
 
   Future<String> read({len = 1024, timeout = 0}) async {
     Pointer<Uint8> buffer = allocate<Uint8>(count: len);
-    buffer.asTypedList(len).fillRange(0, len - 1, 0);
+    buffer.asTypedList(len).fillRange(0, len, 0);
 
-    String str = '';
+    String str = null;
     int ret = 0;
 
     if (timeout > 0) {
@@ -62,6 +62,8 @@ class HID {
 
     if (ret > 0) {
       str = String.fromCharCodes(buffer.asTypedList(ret));
+    } else if (ret == 0) {
+      str = '';
     }
 
     free(buffer);
@@ -101,7 +103,7 @@ class HID {
   Future<String> getFeatureReport(int index, { buffLen: 1024 }) async {
     assert(index < 256);
     Pointer<Uint8> buffer = allocate<Uint8>(count: buffLen);
-    buffer.asTypedList(buffLen).fillRange(0, buffLen - 1, 0);
+    buffer.asTypedList(buffLen).fillRange(0, buffLen, 0);
     buffer[0] = index;
 
     String res = null;
@@ -113,5 +115,64 @@ class HID {
 
     free(buffer);
     return res;
+  }
+
+  Future<String> getManufacturerString({int max = 256}) async {
+    Pointer buffer = allocateWString(count: max);
+    int size = _getManufacturerString(this._device, buffer, max);
+    String res = null;
+
+    if(size == 0) { res = ''; }
+    else if(size > 0) {
+      res = fromWString(buffer, size);
+    }
+    free(buffer);
+    return res;
+  }
+
+  Future<String> getSerialNumberString({int max = 256}) async {
+    Pointer buffer = allocateWString(count: max);
+    int size = _getSerialNumberString(this._device, buffer, max);
+    String res = null;
+
+    if(size == 0) { res = ''; }
+    else if(size > 0) {
+      res = fromWString(buffer, size);
+    }
+    free(buffer);
+    return res;
+  }
+
+  Future<String> getProductString({int max = 256}) async {
+    Pointer buffer = allocateWString(count: max);
+    int size = _getProductString(this._device, buffer, max);
+    String res = null;
+
+    if(size == 0) { res = ''; }
+    else if(size > 0) {
+      res = fromWString(buffer, size);
+    }
+    free(buffer);
+    return res;
+  }
+
+  Future<String> getIndexedString(int index, {int max = 256}) async {
+    Pointer buffer = allocateWString(count: max);
+    int size = _getIndexedString(this._device, index, buffer, max);
+    String res = null;
+
+    if(size == 0) { res = ''; }
+    else if(size > 0) {
+      res = fromWString(buffer, size);
+    }
+    free(buffer);
+    return res;
+  }
+
+  String getError() {
+    Pointer ptr = _getError(this._device);
+    if(ptr == nullptr) { return ''; }
+    int len = wstringLen(ptr);
+    return fromWString(ptr, len);
   }
 }
