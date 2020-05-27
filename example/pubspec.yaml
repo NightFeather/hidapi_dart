@@ -11,4 +11,5 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  hidapi_dart: ^0.0.4
+  hidapi_dart:
+    path: ../

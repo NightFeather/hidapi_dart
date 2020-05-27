@@ -27,7 +27,7 @@ void main(List<String> args) async {
   String payload = '';
 
   for (var i = 0; i < args[2].length; i+=2) {
-    payload += String.fromCharCode(int.parse(args[2].substring(i,i+1), radix: 16));
+    payload += String.fromCharCode(int.parse(args[2].substring(i,i+2), radix: 16));
   }
 
   var hid = HID(idVendor: int.parse(args[0]), idProduct: int.parse(args[1]));
