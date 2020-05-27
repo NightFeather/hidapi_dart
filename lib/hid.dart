@@ -14,7 +14,7 @@ class HID {
   Pointer device = nullptr;
 
   /// Expose the `hid_init` function.
-  /// 
+  ///
   /// no need to manually call this, since hidapi will automatically call this during first hid_open.
   static init() => hidInit();
 
@@ -22,7 +22,7 @@ class HID {
   static exit() => hidExit();
 
   /// call `hid_open` to open the specified device.
-  /// 
+  ///
   /// return 0 on success, -1 on failure
   int open() {
     Pointer<Uint8> buffer = nullptr.cast();
@@ -45,7 +45,7 @@ class HID {
     }
   }
 
-  Future<String> read({len=1024, timeout=0}) async {
+  Future<String> read({len = 1024, timeout = 0}) async {
     Pointer<Uint8> buffer = allocate<Uint8>(count: len);
     buffer.asTypedList(len).fillRange(0, len - 1, 0);
 
