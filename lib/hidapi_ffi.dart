@@ -125,7 +125,7 @@ Pointer allocateWString({String data, int count}) {
     count = data.length;
   }
   if (Platform.isWindows) {
-    Pointer<Uint16> buffer = allocate<Uint16>(count: count);
+    Pointer<Uint16> buffer = calloc<Uint16>(count);
     if (data != null) {
       buffer.asTypedList(data.length).setAll(0, data.runes);
     } else {
@@ -134,7 +134,7 @@ Pointer allocateWString({String data, int count}) {
 
     return buffer;
   } else {
-    Pointer<Uint32> buffer = allocate<Uint32>(count: count);
+    Pointer<Uint32> buffer = calloc<Uint32>(count);
 
     if (data != null) {
       buffer.asTypedList(data.length).setAll(0, data.runes);

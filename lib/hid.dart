@@ -30,13 +30,13 @@ class HID {
     Pointer<Uint8> buffer = nullptr.cast();
 
     if (this.serial != null) {
-      allocate<Uint8>(count: this.serial.length);
+      calloc<Uint8>(this.serial.length);
       buffer.asTypedList(1024).setAll(0, this.serial.runes);
     }
 
     this._device = _openDevice(this.idVendor, this.idProduct, buffer);
 
-    free(buffer);
+    calloc.free(buffer);
 
     return this._device == nullptr ? -1 : 0;
   }
@@ -48,7 +48,7 @@ class HID {
   }
 
   Future<String> read({len = 1024, timeout = 0}) async {
-    Pointer<Uint8> buffer = allocate<Uint8>(count: len);
+    Pointer<Uint8> buffer = calloc<Uint8>(len);
     buffer.asTypedList(len).fillRange(0, len, 0);
 
     String str = null;
@@ -66,18 +66,18 @@ class HID {
       str = '';
     }
 
-    free(buffer);
+    calloc.free(buffer);
     return str;
   }
 
   Future<int> write(String data) async {
     assert(data.length < 256);
     int bufferSize = data.length;
-    Pointer<Uint8> buffer = allocate<Uint8>(count: bufferSize);
+    Pointer<Uint8> buffer = calloc<Uint8>(bufferSize);
     var array = buffer.asTypedList(bufferSize);
     array.setAll(0, data.runes);
     int ret = _writeDevice(this._device, buffer, bufferSize);
-    free(buffer);
+    calloc.free(buffer);
     return ret;
   }
 
@@ -91,18 +91,18 @@ class HID {
   Future<int> sendFeatureReport(String data) async {
     assert(data.length < 256);
     int len = data.length;
-    Pointer<Uint8> buffer = allocate<Uint8>(count: len);
+    Pointer<Uint8> buffer = calloc<Uint8>(len);
     buffer.asTypedList(len).setAll(0, data.runes);
 
     int ret = _sendFeatureReport(this._device, buffer, len);
-    free(buffer);
+    calloc.free(buffer);
 
     return ret;
   }
 
   Future<String> getFeatureReport(int index, { buffLen: 1024 }) async {
     assert(index < 256);
-    Pointer<Uint8> buffer = allocate<Uint8>(count: buffLen);
+    Pointer<Uint8> buffer = calloc<Uint8>(buffLen);
     buffer.asTypedList(buffLen).fillRange(0, buffLen, 0);
     buffer[0] = index;
 
@@ -113,7 +113,7 @@ class HID {
       res = String.fromCharCodes(buffer.asTypedList(ret));
     }
 
-    free(buffer);
+    calloc.free(buffer);
     return res;
   }
 
@@ -126,7 +126,7 @@ class HID {
     else if(size > 0) {
       res = fromWString(buffer, size);
     }
-    free(buffer);
+    calloc.free(buffer);
     return res;
   }
 
@@ -139,7 +139,7 @@ class HID {
     else if(size > 0) {
       res = fromWString(buffer, size);
     }
-    free(buffer);
+    calloc.free(buffer);
     return res;
   }
 
@@ -152,7 +152,7 @@ class HID {
     else if(size > 0) {
       res = fromWString(buffer, size);
     }
-    free(buffer);
+    calloc.free(buffer);
     return res;
   }
 
@@ -165,7 +165,7 @@ class HID {
     else if(size > 0) {
       res = fromWString(buffer, size);
     }
-    free(buffer);
+    calloc.free(buffer);
     return res;
   }
 
