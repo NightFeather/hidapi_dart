@@ -1,8 +1,8 @@
 part of 'hid.dart';
 
-final _hidapi = Platform.isLinux
-    ? DynamicLibrary.open('libhidapi-libusb.so')
-    : DynamicLibrary.open('hidapi.dll');
+final _hidapi = Platform.isWindows
+    ? DynamicLibrary.open('hidapi.dll')
+    : DynamicLibrary.open('libhidapi-hidraw.so');
 
 typedef _HIDInitFnNative = Int32 Function();
 typedef _HIDInitFnDart = int Function();
