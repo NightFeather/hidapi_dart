@@ -104,6 +104,16 @@ final _GetErrorFnDart _getError =
     _hidapi.lookupFunction<_GetErrorFnNative,
       _GetErrorFnDart>('hid_error');
 
+final _stdlib = Platform.isWindows
+  ? DynamicLibrary.open("kernel32.dll")
+  : DynamicLibrary.process();
+
+typedef _wcslenFnNative = Uint64 Function(Pointer);
+typedef _wcslenFnDart = int Function(Pointer);
+
+final _wcslenFnDart _wcslen =
+  _stdlib.lookupFunction<_wcslenFnNative, _wcslenFnDart>('wcslen');
+
 String fromWString(Pointer ptr, {int? len}) {
   if(len == null) { len = wstringLen(ptr); }
 
@@ -144,17 +154,5 @@ Pointer allocateWString({String? data, int? count, Allocator allocator = calloc}
 }
 
 int wstringLen(Pointer ptr) {
-  int i = 0;
-  if (Platform.isWindows) {
-    Pointer<Uint16> tptr = ptr.cast();
-    while (tptr.elementAt(i) != 0) {
-      i++;
-    }
-  } else {
-    Pointer<Uint32> tptr = ptr.cast();
-    while (tptr.elementAt(i) != 0) {
-      i++;
-    }
-  }
-  return i;
+  return _wcslen(ptr);
 }
