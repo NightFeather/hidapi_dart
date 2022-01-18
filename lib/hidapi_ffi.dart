@@ -19,6 +19,11 @@ typedef _OpenDeviceFnDart = Pointer Function(int, int, Pointer);
 final _OpenDeviceFnDart _openDevice =
     _hidapi.lookupFunction<_OpenDeviceFnNative, _OpenDeviceFnDart>('hid_open');
 
+typedef _OpenDevicePathFnNative = Pointer Function(Pointer<Int8>);
+typedef _OpenDevicePathFnDart = Pointer Function(Pointer<Int8>);
+final _OpenDevicePathFnDart _openDevicePath =
+    _hidapi.lookupFunction<_OpenDevicePathFnNative, _OpenDevicePathFnDart>('hid_open_path');
+
 typedef _CloseDeviceFnNative = Void Function(Pointer);
 typedef _CloseDeviceFnDart = void Function(Pointer);
 final _CloseDeviceFnDart _closeDevice = _hidapi
@@ -61,8 +66,6 @@ final _GetFeatureReportFnDart _getFeatureReport =
     _hidapi.lookupFunction<_GetFeatureReportFnNative, _GetFeatureReportFnDart>(
         'hid_get_feature_report');
 
-// fuck those platform inconsistent type.
-
 typedef _GetManufacturerStringFnNative = Int32 Function(
     Pointer, Pointer, Int32);
 typedef _GetManufacturerStringFnDart = int Function(
@@ -101,7 +104,9 @@ final _GetErrorFnDart _getError =
     _hidapi.lookupFunction<_GetErrorFnNative,
       _GetErrorFnDart>('hid_error');
 
-String fromWString(Pointer ptr, int len) {
+String fromWString(Pointer ptr, {int? len}) {
+  if(len == null) { len = wstringLen(ptr); }
+
   if (Platform.isWindows) {
     return String.fromCharCodes(ptr.cast<Uint16>().asTypedList(len));
   } else {
@@ -109,23 +114,15 @@ String fromWString(Pointer ptr, int len) {
   }
 }
 
-Pointer allocateWString({String data, int count}) {
+Pointer allocateWString({String? data, int? count, Allocator allocator = calloc}) {
   assert(data != null || count != null);
+
   if (count == null) {
-    count = data.length;
+    count = data!.length;
   }
+
   if (Platform.isWindows) {
-    Pointer<Uint16> buffer = calloc<Uint16>(count);
-    if (data != null) {
-      buffer.asTypedList(data.length).setAll(0, data.runes);
-    } else {
-      buffer.asTypedList(count).fillRange(0, count, 0);
-    }
-
-    return buffer;
-  } else {
-    Pointer<Uint32> buffer = calloc<Uint32>(count);
-
+    Pointer<Uint16> buffer = allocator<Uint16>(count*2);
     if (data != null) {
       buffer.asTypedList(data.length).setAll(0, data.runes);
     } else {
@@ -134,9 +131,18 @@ Pointer allocateWString({String data, int count}) {
 
     return buffer;
   }
+
+  Pointer<Uint32> buffer = allocator<Uint32>(count*4);
+
+  if (data != null) {
+    buffer.asTypedList(data.length).setAll(0, data.runes);
+  } else {
+    buffer.asTypedList(count).fillRange(0, count, 0);
+  }
+
+  return buffer;
 }
 
-/// maybe call wcslen?
 int wstringLen(Pointer ptr) {
   int i = 0;
   if (Platform.isWindows) {

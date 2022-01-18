@@ -172,7 +172,6 @@ class HID {
   String getError() {
     Pointer ptr = _getError(this._device);
     if(ptr == nullptr) { return ''; }
-    int len = wstringLen(ptr);
-    return fromWString(ptr, len);
+    return fromWString(ptr);
   }
 }
