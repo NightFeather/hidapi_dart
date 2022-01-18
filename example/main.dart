@@ -35,7 +35,7 @@ void read(List<String> args) async {
     exit(1);
   }
 
-  var ret = await hid.read();
+  var ret = await hid.read(timeout: 1);
 
   if(ret == null) {
     stdout.writeln("Cannot read from device.");
@@ -87,7 +87,7 @@ void write(List<String> args) async {
   }
 
   await hid.write(raw);
-  String? str = await hid.read();
+  String? str = await hid.read(timeout: 1);
   stdout.writeln(str);
   hid.close();
 }
