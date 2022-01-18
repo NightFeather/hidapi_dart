@@ -1,3 +1,9 @@
+## [0.0.8] - 2022/01/19
+
+* Upgrade to Flutter 2
+* Null Safety
+* Use hidraw as default backend on Linux
+
 ## [0.0.7] - 2020/05/28
 
 * Minor changes
