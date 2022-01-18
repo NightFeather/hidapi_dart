@@ -1,16 +1,16 @@
 import 'dart:ffi';
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:ffi/ffi.dart';
 
 part 'hidapi_ffi.dart';
 
 /// Wrap around the hid_device pointer.
 class HID {
-  HID({this.idVendor, this.idProduct, this.serial});
+  HID({ this.idVendor = 0, this.idProduct = 0, this.serial });
 
   final int idVendor;
   final int idProduct;
-  final String serial;
+  final String? serial;
 
   Pointer _device = nullptr;
   bool _nonblocking = false;
@@ -30,8 +30,8 @@ class HID {
     Pointer<Uint8> buffer = nullptr.cast();
 
     if (this.serial != null) {
-      calloc<Uint8>(this.serial.length);
-      buffer.asTypedList(1024).setAll(0, this.serial.runes);
+      calloc<Uint8>(this.serial!.length);
+      buffer.asTypedList(1024).setAll(0, this.serial!.runes);
     }
 
     this._device = _openDevice(this.idVendor, this.idProduct, buffer);
@@ -47,11 +47,11 @@ class HID {
     }
   }
 
-  Future<String> read({len = 1024, timeout = 0}) async {
+  Future<String?> read({len = 1024, timeout = 0}) async {
     Pointer<Uint8> buffer = calloc<Uint8>(len);
     buffer.asTypedList(len).fillRange(0, len, 0);
 
-    String str = null;
+    String? str = null;
     int ret = 0;
 
     if (timeout > 0) {
