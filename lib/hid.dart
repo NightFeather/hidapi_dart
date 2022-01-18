@@ -100,72 +100,71 @@ class HID {
     return ret;
   }
 
-  Future<String> getFeatureReport(int index, { buffLen: 1024 }) async {
+  Future<String?> getFeatureReport(int index, { buffLen: 1024 }) async {
     assert(index < 256);
-    Pointer<Uint8> buffer = calloc<Uint8>(buffLen);
-    buffer.asTypedList(buffLen).fillRange(0, buffLen, 0);
-    buffer[0] = index;
 
-    String res = null;
-    int ret = _getFeatureReport(this._device, buffer, buffLen);
+    String? res = null;
 
-    if(ret > 0) {
-      res = String.fromCharCodes(buffer.asTypedList(ret));
-    }
+    using((Arena arena) {
+      Pointer<Uint8> buffer = arena<Uint8>(buffLen);
+      buffer.asTypedList(buffLen).fillRange(0, buffLen, 0);
+      buffer[0] = index;
 
-    calloc.free(buffer);
+      int ret = _getFeatureReport(this._device, buffer, buffLen);
+
+      if(ret > 0) {
+        res = String.fromCharCodes(buffer.asTypedList(ret));
+      }
+    });
+
     return res;
   }
 
-  Future<String> getManufacturerString({int max = 256}) async {
-    Pointer buffer = allocateWString(count: max);
-    int size = _getManufacturerString(this._device, buffer, max);
-    String res = null;
+  Future<String?> getManufacturerString({int max = 256}) async {
+    String? res = null;
 
-    if(size == 0) { res = ''; }
-    else if(size > 0) {
-      res = fromWString(buffer, size);
-    }
-    calloc.free(buffer);
+    using((Arena arena) {
+      var buffer = allocateWString(count: max, allocator: arena);
+      int ret = _getManufacturerString(this._device, buffer, max);
+      if(ret == 0) { res = fromWString(buffer); }
+    });
+
     return res;
   }
 
-  Future<String> getSerialNumberString({int max = 256}) async {
-    Pointer buffer = allocateWString(count: max);
-    int size = _getSerialNumberString(this._device, buffer, max);
-    String res = null;
+  Future<String?> getSerialNumberString({int max = 256}) async {
+    String? res = null;
 
-    if(size == 0) { res = ''; }
-    else if(size > 0) {
-      res = fromWString(buffer, size);
-    }
-    calloc.free(buffer);
+    using((Arena arena) {
+      var buffer = allocateWString(count: max, allocator: arena);
+      int ret = _getSerialNumberString(this._device, buffer, max);
+      if(ret == 0) { res = fromWString(buffer); }
+    });
+
     return res;
   }
 
-  Future<String> getProductString({int max = 256}) async {
-    Pointer buffer = allocateWString(count: max);
-    int size = _getProductString(this._device, buffer, max);
-    String res = null;
+  Future<String?> getProductString({int max = 256}) async {
+    String? res = null;
 
-    if(size == 0) { res = ''; }
-    else if(size > 0) {
-      res = fromWString(buffer, size);
-    }
-    calloc.free(buffer);
+    using((Arena arena) {
+      var buffer = allocateWString(count: max, allocator: arena);
+      int ret = _getProductString(this._device, buffer, max);
+      if(ret == 0) { res = fromWString(buffer); }
+    });
+
     return res;
   }
 
-  Future<String> getIndexedString(int index, {int max = 256}) async {
-    Pointer buffer = allocateWString(count: max);
-    int size = _getIndexedString(this._device, index, buffer, max);
-    String res = null;
+  Future<String?> getIndexedString(int index, {int max = 256}) async {
+    String? res = null;
 
-    if(size == 0) { res = ''; }
-    else if(size > 0) {
-      res = fromWString(buffer, size);
-    }
-    calloc.free(buffer);
+    using((Arena arena) {
+      var buffer = allocateWString(count: max, allocator: arena);
+      int ret = _getIndexedString(this._device, index, buffer, max);
+      if(ret == 0) { res = fromWString(buffer); }
+    });
+
     return res;
   }
 
