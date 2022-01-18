@@ -63,53 +63,43 @@ final _GetFeatureReportFnDart _getFeatureReport =
 
 // fuck those platform inconsistent type.
 
-typedef _GetManufacturerStringFnNative<T extends NativeType> = Int32 Function(
-    Pointer, Pointer<T>, Int32);
-typedef _GetManufacturerStringFnDart<T extends NativeType> = int Function(
-    Pointer, Pointer<T>, int);
-final _GetManufacturerStringFnDart _getManufacturerString = Platform.isWindows
-    ? _hidapi.lookupFunction<_GetManufacturerStringFnNative<Uint16>,
-        _GetManufacturerStringFnDart<Uint16>>('hid_get_manufacturer_string')
-    : _hidapi.lookupFunction<_GetManufacturerStringFnNative<Uint32>,
-        _GetManufacturerStringFnDart<Uint32>>('hid_get_manufacturer_string');
+typedef _GetManufacturerStringFnNative = Int32 Function(
+    Pointer, Pointer, Int32);
+typedef _GetManufacturerStringFnDart = int Function(
+    Pointer, Pointer, int);
+final _GetManufacturerStringFnDart _getManufacturerString =
+    _hidapi.lookupFunction<_GetManufacturerStringFnNative,
+      _GetManufacturerStringFnDart>('hid_get_manufacturer_string');
 
-typedef _GetProductStringFnNative<T extends NativeType> = Int32 Function(
-    Pointer, Pointer<T>, Int32);
-typedef _GetProductStringFnDart<T extends NativeType> = int Function(
-    Pointer, Pointer<T>, int);
-final _GetProductStringFnDart _getProductString = Platform.isWindows
-    ? _hidapi.lookupFunction<_GetProductStringFnNative<Uint16>,
-        _GetProductStringFnDart<Uint16>>('hid_get_product_string')
-    : _hidapi.lookupFunction<_GetProductStringFnNative<Uint32>,
-        _GetProductStringFnDart<Uint32>>('hid_get_product_string');
+typedef _GetProductStringFnNative = Int32 Function(
+    Pointer, Pointer, Int32);
+typedef _GetProductStringFnDart = int Function(
+    Pointer, Pointer, int);
+final _GetProductStringFnDart _getProductString =
+    _hidapi.lookupFunction<_GetProductStringFnNative,
+      _GetProductStringFnDart>('hid_get_product_string');
 
-typedef _GetSerialNumberStringFnNative<T extends NativeType> = Int32 Function(
-    Pointer, Pointer<T>, Int32);
-typedef _GetSerialNumberStringFnDart<T extends NativeType> = int Function(
-    Pointer, Pointer<T>, int);
-final _GetSerialNumberStringFnDart _getSerialNumberString = Platform.isWindows
-    ? _hidapi.lookupFunction<_GetSerialNumberStringFnNative<Uint16>,
-        _GetSerialNumberStringFnDart<Uint16>>('hid_get_serial_number_string')
-    : _hidapi.lookupFunction<_GetSerialNumberStringFnNative<Uint32>,
-        _GetSerialNumberStringFnDart<Uint32>>('hid_get_serial_number_string');
+typedef _GetSerialNumberStringFnNative = Int32 Function(
+    Pointer, Pointer, Int32);
+typedef _GetSerialNumberStringFnDart = int Function(
+    Pointer, Pointer, int);
+final _GetSerialNumberStringFnDart _getSerialNumberString =
+    _hidapi.lookupFunction<_GetSerialNumberStringFnNative,
+      _GetSerialNumberStringFnDart>('hid_get_serial_number_string');
 
-typedef _GetIndexedStringFnNative<T extends NativeType> = Int32 Function(
-    Pointer, Int32, Pointer<T>, Int32);
-typedef _GetIndexedStringFnDart<T extends NativeType> = int Function(
-    Pointer, int, Pointer<T>, int);
-final _GetIndexedStringFnDart _getIndexedString = Platform.isWindows
-    ? _hidapi.lookupFunction<_GetIndexedStringFnNative<Uint16>,
-        _GetIndexedStringFnDart<Uint16>>('hid_get_indexed_string')
-    : _hidapi.lookupFunction<_GetIndexedStringFnNative<Uint32>,
-        _GetIndexedStringFnDart<Uint32>>('hid_get_indexed_string');
+typedef _GetIndexedStringFnNative = Int32 Function(
+    Pointer, Int32, Pointer, Int32);
+typedef _GetIndexedStringFnDart = int Function(
+    Pointer, int, Pointer, int);
+final _GetIndexedStringFnDart _getIndexedString =
+    _hidapi.lookupFunction<_GetIndexedStringFnNative,
+      _GetIndexedStringFnDart>('hid_get_indexed_string');
 
-typedef _GetErrorFnNative<T extends NativeType> = Pointer<T> Function(Pointer);
-typedef _GetErrorFnDart<T extends NativeType> = Pointer<T> Function(Pointer);
-final _GetErrorFnDart _getError = Platform.isWindows
-    ? _hidapi.lookupFunction<_GetErrorFnNative<Uint16>,
-        _GetErrorFnDart<Uint16>>('hid_error')
-    : _hidapi.lookupFunction<_GetErrorFnNative<Uint32>,
-        _GetErrorFnDart<Uint32>>('hid_error');
+typedef _GetErrorFnNative = Pointer Function(Pointer);
+typedef _GetErrorFnDart = Pointer Function(Pointer);
+final _GetErrorFnDart _getError =
+    _hidapi.lookupFunction<_GetErrorFnNative,
+      _GetErrorFnDart>('hid_error');
 
 String fromWString(Pointer ptr, int len) {
   if (Platform.isWindows) {
