@@ -2,7 +2,11 @@ part of 'hid.dart';
 
 final _hidapi = Platform.isWindows
     ? DynamicLibrary.open('hidapi.dll')
-    : DynamicLibrary.open('libhidapi-hidraw.so');
+    : Platform.isMacOS
+    ? DynamicLibrary.open("libhidapi.dylib")
+    : Platform.isLinux
+    ? DynamicLibrary.open('libhidapi-hidraw.so')
+    : throw "Unsupported Platform";
 
 typedef _HIDInitFnNative = Int32 Function();
 typedef _HIDInitFnDart = int Function();
