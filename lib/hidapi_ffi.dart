@@ -105,7 +105,7 @@ final _GetErrorFnDart _getError =
       _GetErrorFnDart>('hid_error');
 
 final _stdlib = Platform.isWindows
-  ? DynamicLibrary.open("kernel32.dll")
+  ? DynamicLibrary.open("msvcrt.dll")
   : DynamicLibrary.process();
 
 typedef _wcslenFnNative = Uint64 Function(Pointer);
