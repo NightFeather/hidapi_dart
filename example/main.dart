@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:hidapi_dart/hidapi_dart.dart';
 
 void printError(HID hid) {
-  stdout.writeln("Error: ${hid.getError()}");
+  stderr.writeln("Error: ${hid.getError()}");
 }
 
 HID? getDeviceFromArgs(List<String> args) {
@@ -10,10 +10,14 @@ HID? getDeviceFromArgs(List<String> args) {
   if(idx == 0) { return null; }
   List<String> parsable;
   if(idx == -1) { parsable = args; }
-  else { parsable = args.getRange(0, idx).toList(); }
+  else {
+    parsable = args.getRange(0, idx).toList();
+    args.removeRange(0, idx+1);
+  }
 
   int? vid = int.tryParse(parsable.removeAt(0));
   int? pid = int.tryParse(parsable.removeAt(0));
+
   String? serial;
   if(parsable.length > 0) {
     serial = parsable.removeAt(0);
@@ -22,90 +26,114 @@ HID? getDeviceFromArgs(List<String> args) {
   return HID(idVendor: vid == null ? 0 : vid, idProduct: pid == null ? 0 : pid, serial: serial);
 }
 
+String? getPayloadFromArgs(List<String> args) {
+  if(args.length <= 0) { return null; }
+
+  String raw = '';
+
+  String payload = args.removeAt(0);
+
+  var hexpat = RegExp(r"^([a-z0-9]{2})+$", caseSensitive: false);
+  if(!hexpat.hasMatch(payload)) {
+    stderr.writeln("Invalid payload, only accept hexstring");
+    return null;
+  }
+
+  for (var i = 0; i < payload.length; i+=2) {
+    raw += String.fromCharCode(int.parse(payload.substring(i,i+2), radix: 16));
+  }
+
+  return raw;
+}
+
 void read(List<String> args) async {
   HID? hid = getDeviceFromArgs(args);
   if(hid == null) {
-    stdout.writeln("Invalid device specifier.");
+    stderr.writeln("Invalid device specifier.");
     exit(1);
   }
 
   if(hid.open() < 0) {
-    stdout.writeln("Cannot open hid device.");
+    stderr.writeln("Cannot open hid device.");
     printError(hid);
     exit(1);
   }
 
-  var ret = await hid.read(timeout: 1);
+  int timeout = 1;
+  if(args.length > 0) { timeout = int.parse(args.removeAt(0)); }
+
+  var ret = await hid.read(timeout: timeout);
 
   if(ret == null) {
-    stdout.writeln("Cannot read from device.");
+    stderr.writeln("Cannot read from device.");
     printError(hid);
     hid.close();
     exit(1);
   }
 
-  stdout.write(ret);
+  stderr.write(ret.runes);
   hid.close();
 }
 
 void write(List<String> args) async {
 
   if(args.length <= 0) {
-    stdout.writeln("Missing payload");
+    stderr.writeln("Missing payload");
     exit(1);
   }
 
   HID? hid = getDeviceFromArgs(args);
   if(hid == null) {
-    stdout.writeln("Invalid device specifier.");
+    stderr.writeln("Invalid device specifier.");
     exit(1);
   }
 
   if(hid.open() < 0) {
-    stdout.writeln("Cannot open hid device.");
+    stderr.writeln("Cannot open hid device.");
     printError(hid);
     exit(1);
   }
 
-  String payload = args.elementAt(0);
-
-  var hexpat = RegExp(r"^([a-z0-9]{2})+$", caseSensitive: false);
-  if(!hexpat.hasMatch(payload)) {
-    stdout.writeln("Invalid payload, only accept hexstring");
-  }
-
-  String raw = '';
-
-  for (var i = 0; i < payload.length; i+=2) {
-    raw += String.fromCharCode(int.parse(payload.substring(i,i+2), radix: 16));
-  }
+  String? raw = getPayloadFromArgs(args);
+  if(raw == null) { exit(1); }
+ 
+  int timeout = 1;
+  if(args.length > 0) { timeout = int.parse(args.removeAt(0)); }
 
   if(hid.open() < 0) {
-    stdout.writeln('HID Device open failed!');
+    stderr.writeln('HID Device open failed!');
     printError(hid);
     return;
   }
 
   await hid.write(raw);
   String? str = await hid.read(timeout: 1);
-  stdout.writeln(str);
+
+  if(str == null) {
+    stderr.writeln("Cannot read from device.");
+    printError(hid);
+    hid.close();
+    exit(1);
+  }
+
+  stderr.writeln(str.runes);
   hid.close();
 }
 
 void info(List<String> args) async {
   HID? hid = getDeviceFromArgs(args);
   if(hid == null) {
-    stdout.writeln("Invalid device specifier.");
+    stderr.writeln("Invalid device specifier.");
     exit(1);
   }
 
   if(hid.open() < 0) {
-    stdout.writeln("Cannot open hid device.");
+    stderr.writeln("Cannot open hid device.");
     printError(hid);
     exit(1);
   }
 
-  stdout.writeln("reading...");
+  stderr.writeln("reading...");
 
   var prod = await hid.getProductString();
   var serial = await hid.getSerialNumberString();
@@ -120,8 +148,8 @@ void info(List<String> args) async {
     exit(1);
   }
 
-  stdout.writeln("product=${prod}");
-  stdout.writeln("serial=${serial}");
+  stderr.writeln("product=${prod}");
+  stderr.writeln("serial=${serial}");
   exit(0);
 }
 
@@ -132,8 +160,8 @@ void help(List<String> args) async {
       """
       Usage:
         ${exe} ${script} info <DevSpec>
-        ${exe} ${script} read <DevSpec>
-        ${exe} ${script} write <DevSpec> -- <payload>
+        ${exe} ${script} read <DevSpec> [--] [timeout]
+        ${exe} ${script} write <DevSpec> [--] <payload> [timeout]
 
       DevSpec:
         <vid> <pid> [serial]
