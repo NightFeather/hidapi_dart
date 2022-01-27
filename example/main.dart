@@ -1,8 +1,21 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:hidapi_dart/hidapi_dart.dart';
 
 void printError(HID hid) {
   stderr.writeln("Error: ${hid.getError()}");
+}
+
+extension HexString on String {
+  String toHexString() {
+    var list = utf8.encode(this);
+    String out = '';
+    for(var i = 0; i < list.length; i ++) {
+      out += list[i].toRadixString(16).padLeft(2, '0');
+    }
+
+    return out;
+  }
 }
 
 HID? getDeviceFromArgs(List<String> args) {
@@ -71,7 +84,8 @@ void read(List<String> args) async {
     exit(1);
   }
 
-  stderr.write(ret.runes);
+  stderr.write('< ');
+  stderr.writeln(ret.toHexString());
   hid.close();
 }
 
@@ -106,7 +120,11 @@ void write(List<String> args) async {
     return;
   }
 
+  stderr.write('> ');
+  stderr.writeln(raw.toHexString());
   await hid.write(raw);
+
+  stderr.write('< ');
   String? str = await hid.read(timeout: 1);
 
   if(str == null) {
@@ -116,7 +134,7 @@ void write(List<String> args) async {
     exit(1);
   }
 
-  stderr.writeln(str.runes);
+  stderr.writeln(str.toHexString());
   hid.close();
 }
 
