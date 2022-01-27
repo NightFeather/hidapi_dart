@@ -1,3 +1,7 @@
+## [0.0.11] - 2022/01/28
+
+* fix bytes handling, never use utf8 on random bytes.
+
 ## [0.0.10] - 2022/01/27
 
 * fix the crash when try open device with serial.
