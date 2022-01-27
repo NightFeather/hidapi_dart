@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:ffi/ffi.dart';
 
@@ -27,16 +28,17 @@ class HID {
   ///
   /// return 0 on success, -1 on failure
   int open() {
-    Pointer<Uint8> buffer = nullptr.cast();
+    Pointer buffer = nullptr.cast();
+    var _serial = this.serial;
 
-    if (this.serial != null) {
-      calloc<Uint8>(this.serial!.length);
-      buffer.asTypedList(1024).setAll(0, this.serial!.runes);
-    }
+    using((Arena arena) {
+      if (_serial != null) {
+        var cpcount = _serial.runes.length;
+        buffer = allocateWString(cpcount, data: _serial, allocator: arena);
+      }
 
-    this._device = _openDevice(this.idVendor, this.idProduct, buffer);
-
-    calloc.free(buffer);
+      this._device = _openDevice(this.idVendor, this.idProduct, buffer);
+    });
 
     return this._device == nullptr ? -1 : 0;
   }
@@ -48,36 +50,40 @@ class HID {
   }
 
   Future<String?> read({len = 1024, timeout = 0}) async {
-    Pointer<Uint8> buffer = calloc<Uint8>(len);
-    buffer.asTypedList(len).fillRange(0, len, 0);
-
     String? str = null;
-    int ret = 0;
 
-    if (timeout > 0) {
-      ret = _readDeviceTimeout(this._device, buffer, len, timeout);
-    } else {
-      ret = _readDevice(this._device, buffer, len);
-    }
+    using((Arena arena) {
+      var buffer = arena<Uint8>(len);
 
-    if (ret > 0) {
-      str = String.fromCharCodes(buffer.asTypedList(ret));
-    } else if (ret == 0) {
-      str = '';
-    }
+      int ret = 0;
 
-    calloc.free(buffer);
+      if (timeout > 0) {
+        ret = _readDeviceTimeout(this._device, buffer, len, timeout);
+      } else {
+        ret = _readDevice(this._device, buffer, len);
+      }
+
+      if (ret > 0) {
+        str = buffer.cast<Utf8>().toDartString(length: ret);
+      } else if (ret == 0) {
+        str = '';
+      }
+    });
+
     return str;
   }
 
   Future<int> write(String data) async {
     assert(data.length < 256);
-    int bufferSize = data.length;
-    Pointer<Uint8> buffer = calloc<Uint8>(bufferSize);
-    var array = buffer.asTypedList(bufferSize);
-    array.setAll(0, data.runes);
-    int ret = _writeDevice(this._device, buffer, bufferSize);
-    calloc.free(buffer);
+    int ret = 0;
+
+    using((Arena arena) {
+      var _buffer = utf8.encode(data);
+      var buffer = arena<Uint8>(_buffer.length);
+      buffer.asTypedList(_buffer.length).setAll(0, _buffer);
+      ret = _writeDevice(this._device, buffer, _buffer.length);
+    });
+
     return ret;
   }
 
@@ -124,7 +130,7 @@ class HID {
     String? res = null;
 
     using((Arena arena) {
-      var buffer = allocateWString(count: max, allocator: arena);
+      var buffer = allocateWString(max, allocator: arena);
       int ret = _getManufacturerString(this._device, buffer, max);
       if(ret == 0) { res = fromWString(buffer); }
     });
@@ -136,7 +142,7 @@ class HID {
     String? res = null;
 
     using((Arena arena) {
-      var buffer = allocateWString(count: max, allocator: arena);
+      var buffer = allocateWString(max, allocator: arena);
       int ret = _getSerialNumberString(this._device, buffer, max);
       if(ret == 0) { res = fromWString(buffer); }
     });
@@ -148,7 +154,7 @@ class HID {
     String? res = null;
 
     using((Arena arena) {
-      var buffer = allocateWString(count: max, allocator: arena);
+      var buffer = allocateWString(max, allocator: arena);
       int ret = _getProductString(this._device, buffer, max);
       if(ret == 0) { res = fromWString(buffer); }
     });
@@ -160,7 +166,7 @@ class HID {
     String? res = null;
 
     using((Arena arena) {
-      var buffer = allocateWString(count: max, allocator: arena);
+      var buffer = allocateWString(max, allocator: arena);
       int ret = _getIndexedString(this._device, index, buffer, max);
       if(ret == 0) { res = fromWString(buffer); }
     });

@@ -124,33 +124,23 @@ String fromWString(Pointer ptr, {int? len}) {
   }
 }
 
-Pointer allocateWString({String? data, int? count, Allocator allocator = calloc}) {
-  assert(data != null || count != null);
+Pointer allocateWString(int count, { String? data,  Allocator allocator = calloc }) {
+    if (Platform.isWindows) {
+      Pointer<Uint16> buffer = allocator<Uint16>(count*2);
+      if(data != null) {
+        buffer.asTypedList(count*2).setAll(0, data.runes);
+      }
+      return buffer;
+    }
+  
+    Pointer<Uint32> buffer = allocator<Uint32>(count*4);
 
-  if (count == null) {
-    count = data!.length;
-  }
-
-  if (Platform.isWindows) {
-    Pointer<Uint16> buffer = allocator<Uint16>(count*2);
-    if (data != null) {
-      buffer.asTypedList(data.length).setAll(0, data.runes);
-    } else {
-      buffer.asTypedList(count).fillRange(0, count, 0);
+    if(data != null) {
+      buffer.asTypedList(count*2).setAll(0, data.runes);
     }
 
     return buffer;
-  }
 
-  Pointer<Uint32> buffer = allocator<Uint32>(count*4);
-
-  if (data != null) {
-    buffer.asTypedList(data.length).setAll(0, data.runes);
-  } else {
-    buffer.asTypedList(count).fillRange(0, count, 0);
-  }
-
-  return buffer;
 }
 
 int wstringLen(Pointer ptr) {
