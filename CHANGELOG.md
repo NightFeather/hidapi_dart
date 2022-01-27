@@ -1,3 +1,8 @@
+## [0.0.10] - 2022/01/27
+
+* fix the crash when try open device with serial.
+* imporve the memory management
+
 ## [0.0.9] - 2022/01/27
 
 * Fix library loading error on Windows.
