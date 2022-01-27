@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:io' show Platform;
 import 'package:ffi/ffi.dart';
 
@@ -49,9 +50,8 @@ class HID {
     }
   }
 
-  Future<String?> read({len = 1024, timeout = 0}) async {
-    String? str = null;
-
+  Future<Uint8List?> read({len = 1024, timeout = 0}) async {
+    Uint8List? str;
     using((Arena arena) {
       var buffer = arena<Uint8>(len);
 
@@ -64,24 +64,23 @@ class HID {
       }
 
       if (ret > 0) {
-        str = buffer.cast<Utf8>().toDartString(length: ret);
+        str = Uint8List.fromList(buffer.asTypedList(ret));
       } else if (ret == 0) {
-        str = '';
+        str = Uint8List(0);
       }
     });
 
     return str;
   }
 
-  Future<int> write(String data) async {
+  Future<int> write(Uint8List data) async {
     assert(data.length < 256);
     int ret = 0;
 
     using((Arena arena) {
-      var _buffer = utf8.encode(data);
-      var buffer = arena<Uint8>(_buffer.length);
-      buffer.asTypedList(_buffer.length).setAll(0, _buffer);
-      ret = _writeDevice(this._device, buffer, _buffer.length);
+      var buffer = arena<Uint8>(data.length);
+      buffer.asTypedList(data.length).setAll(0, data);
+      ret = _writeDevice(this._device, buffer, data.length);
     });
 
     return ret;
@@ -94,11 +93,11 @@ class HID {
 
   bool get nonblocking => this._nonblocking;
 
-  Future<int> sendFeatureReport(String data) async {
+  Future<int> sendFeatureReport(Uint8List data) async {
     assert(data.length < 256);
     int len = data.length;
     Pointer<Uint8> buffer = calloc<Uint8>(len);
-    buffer.asTypedList(len).setAll(0, data.runes);
+    buffer.asTypedList(len).setAll(0, data);
 
     int ret = _sendFeatureReport(this._device, buffer, len);
     calloc.free(buffer);
@@ -106,10 +105,10 @@ class HID {
     return ret;
   }
 
-  Future<String?> getFeatureReport(int index, { buffLen: 1024 }) async {
+  Future<Uint8List?> getFeatureReport(int index, { buffLen: 1024 }) async {
     assert(index < 256);
 
-    String? res = null;
+    Uint8List? res = null;
 
     using((Arena arena) {
       Pointer<Uint8> buffer = arena<Uint8>(buffLen);
@@ -119,7 +118,7 @@ class HID {
       int ret = _getFeatureReport(this._device, buffer, buffLen);
 
       if(ret > 0) {
-        res = String.fromCharCodes(buffer.asTypedList(ret));
+        res = Uint8List.fromList(buffer.asTypedList(ret));
       }
     });
 

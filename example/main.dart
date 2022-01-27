@@ -1,20 +1,16 @@
 import 'dart:io';
-import 'dart:convert';
+import 'dart:typed_data';
 import 'package:hidapi_dart/hidapi_dart.dart';
 
 void printError(HID hid) {
   stderr.writeln("Error: ${hid.getError()}");
 }
 
-extension HexString on String {
+extension Uint8ListAsHex on Uint8List {
   String toHexString() {
-    var list = utf8.encode(this);
-    String out = '';
-    for(var i = 0; i < list.length; i ++) {
-      out += list[i].toRadixString(16).padLeft(2, '0');
-    }
-
-    return out;
+    var res = "";
+    forEach((el) => res += (el.toRadixString(16).padLeft(2, '0')));
+    return res;
   }
 }
 
@@ -39,10 +35,10 @@ HID? getDeviceFromArgs(List<String> args) {
   return HID(idVendor: vid == null ? 0 : vid, idProduct: pid == null ? 0 : pid, serial: serial);
 }
 
-String? getPayloadFromArgs(List<String> args) {
+Uint8List? getPayloadFromArgs(List<String> args) {
   if(args.length <= 0) { return null; }
 
-  String raw = '';
+  var raw = List<int>.empty(growable: true);
 
   String payload = args.removeAt(0);
 
@@ -53,10 +49,11 @@ String? getPayloadFromArgs(List<String> args) {
   }
 
   for (var i = 0; i < payload.length; i+=2) {
-    raw += String.fromCharCode(int.parse(payload.substring(i,i+2), radix: 16));
+    var seg = payload.substring(i, i+2);
+    raw.add(int.parse(seg, radix: 16));
   }
 
-  return raw;
+  return Uint8List.fromList(raw);
 }
 
 void read(List<String> args) async {
@@ -108,7 +105,7 @@ void write(List<String> args) async {
     exit(1);
   }
 
-  String? raw = getPayloadFromArgs(args);
+  var raw = getPayloadFromArgs(args);
   if(raw == null) { exit(1); }
  
   int timeout = 1;
@@ -125,7 +122,7 @@ void write(List<String> args) async {
   await hid.write(raw);
 
   stderr.write('< ');
-  String? str = await hid.read(timeout: 1);
+  var str = await hid.read(timeout: 1);
 
   if(str == null) {
     stderr.writeln("Cannot read from device.");

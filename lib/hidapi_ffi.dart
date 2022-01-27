@@ -140,7 +140,6 @@ Pointer allocateWString(int count, { String? data,  Allocator allocator = calloc
     }
 
     return buffer;
-
 }
 
 int wstringLen(Pointer ptr) {
