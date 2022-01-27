@@ -1,3 +1,7 @@
+## [0.0.9] - 2022/01/27
+
+* Fix library loading error on Windows.
+
 ## [0.0.8] - 2022/01/19
 
 * Upgrade to Flutter 2
